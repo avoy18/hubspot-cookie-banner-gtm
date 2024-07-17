@@ -36,6 +36,11 @@ ___TEMPLATE_PARAMETERS___
     "displayName": "Default consent settings",
     "subParams": [
       {
+        "type": "LABEL",
+        "name": "ad_storage_label",
+        "displayName": "ad_storage"
+      },
+      {
         "type": "SELECT",
         "name": "ad_storage",
         "displayName": "",
@@ -50,6 +55,32 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "simpleValueType": true
+      },
+      {
+        "type": "LABEL",
+        "name": "ad_user_data_label",
+        "displayName": "ad_user_data"
+      },
+      {
+        "type": "SELECT",
+        "name": "ad_user_data",
+        "displayName": "",
+        "selectItems": [
+          {
+            "value": "denied",
+            "displayValue": "denied"
+          },
+          {
+            "value": "granted",
+            "displayValue": "granted"
+          }
+        ],
+        "simpleValueType": true
+      },
+      {
+        "type": "LABEL",
+        "name": "analytics_storage_label",
+        "displayName": "analytics_storage"
       },
       {
         "type": "SELECT",
@@ -68,6 +99,11 @@ ___TEMPLATE_PARAMETERS___
         "simpleValueType": true
       },
       {
+        "type": "LABEL",
+        "name": "functionality_storage_label",
+        "displayName": "functionality_storage"
+      },
+      {
         "type": "SELECT",
         "name": "functionality_storage",
         "displayName": "",
@@ -82,6 +118,11 @@ ___TEMPLATE_PARAMETERS___
           }
         ],
         "simpleValueType": true
+      },
+      {
+        "type": "LABEL",
+        "name": "personalization_storage_label",
+        "displayName": "personalization_storage"
       },
       {
         "type": "SELECT",
@@ -123,6 +164,7 @@ var getValueOrDefault = function (value, defaultValue) {
 var theConsentState = {
   ad_storage: getValueOrDefault(data.ad_storage, "denied"),
   analytics_storage: getValueOrDefault(data.analytics_storage, "denied"),
+  ad_user_data: getValueOrDefault(data.ad_user_data, "denied"),
   functionality_storage: getValueOrDefault(
     data.functionality_storage,
     "denied"
@@ -132,6 +174,7 @@ var theConsentState = {
     "denied"
   ),
   security_storage: getValueOrDefault(data.security_storage, "granted"),
+  wait_for_update: 500
 };
 
 /**
@@ -156,6 +199,8 @@ var updateConsentObject = function () {
 
   theConsentState.analytics_storage =
     currentCookieValues[0] === "false" ? "denied" : theConsentState.analytics_storage;
+  theConsentState.ad_user_data =
+    currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_user_data;
   theConsentState.ad_storage =
     currentCookieValues[1] === "false" ? "denied" : theConsentState.ad_storage;
   theConsentState.functionality_storage =
