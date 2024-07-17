@@ -13,7 +13,7 @@ ___INFO___
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "displayName": "Hubspot cookie banner - integration with GTM",
+  "displayName": "Hubspot CMP - Hubspot cookie banner - integration",
   "categories": ["PERSONALIZATION", "TAG_MANAGEMENT", "DATA_WAREHOUSING"],
   "brand": {
     "id": "github.com_avoy18",
