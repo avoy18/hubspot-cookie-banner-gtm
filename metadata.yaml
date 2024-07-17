@@ -1,5 +1,5 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmpn"
 versions:
-  - sha: 5f02a788b90ae804f86b04aa24af8937e567874a
-    changeNotes: Initial release.
+  - sha: 7bbb0b95c20039f9cc31468d3946de62690ee499
+    changeNotes: Initial version
