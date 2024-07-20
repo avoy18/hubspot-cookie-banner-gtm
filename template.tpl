@@ -139,6 +139,26 @@ ___TEMPLATE_PARAMETERS___
           "simpleValueType": true
         },
         "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_personalization",
+          "displayName": "ad_personalization",
+          "macrosInSelect": false,
+          "selectItems": [
+            {
+              "value": "denied",
+              "displayValue": "denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "granted"
+            }
+          ],
+          "simpleValueType": true
+        },
+        "isUnique": false
       }
     ]
   },
@@ -161,6 +181,7 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 // var log = require('logToConsole');
 var callInWindow = require("callInWindow");
+var createQueue = require("createQueue");
 var setDefaultConsentState = require("setDefaultConsentState");
 var gtagSet = require('gtagSet');
 var updateConsentState = require("updateConsentState");
@@ -175,9 +196,12 @@ var theConsentState = {
   ad_user_data: "denied",
   functionality_storage: "denied",
   personalization_storage: "denied",
+  ad_personalization: "denied",
   security_storage: "denied",
   wait_for_update: 500
 };
+
+var dataLayerPush = createQueue('dataLayer');
 
 /**
  * Splits the input in a correct way to parse the cookie data
@@ -212,6 +236,10 @@ var updateConsentObject = function () {
     currentCookieValues[0] === "false" ? "denied" : theConsentState.analytics_storage;
   theConsentState.ad_user_data =
     currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_user_data;
+  theConsentState.personalization_storage =
+    currentCookieValues[0] === "false" ? "denied" : theConsentState.personalization_storage;
+  theConsentState.ad_personalization =
+    currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_personalization;
   theConsentState.ad_storage =
     currentCookieValues[1] === "false" ? "denied" : theConsentState.ad_storage;
   theConsentState.functionality_storage =
@@ -234,6 +262,7 @@ if (consentModeEnabled !== false) {
         analytics_storage: settings.analytics_storage,
         functionality_storage: settings.functionality_storage,
         personalization_storage: settings.personalization_storage,
+        ad_personalization: settings.ad_personalization,
       };
 
       if(settings.region){
@@ -262,7 +291,7 @@ if (consentModeEnabled !== false) {
     function () {
       updateConsentObject();
       updateConsentState(theConsentState);
-      callInWindow("gtag", "event", "cookie_consent_update");
+      dataLayerPush({'event': 'cookie_consent_update'});
     },
   ]);
 }
@@ -639,6 +668,37 @@ ___WEB_PERMISSIONS___
                   {
                     "type": 1,
                     "string": "ad_user_data"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_personalization"
                   },
                   {
                     "type": 8,
