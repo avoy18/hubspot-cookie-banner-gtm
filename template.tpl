@@ -759,7 +759,23 @@ ___WEB_PERMISSIONS___
         "publicId": "write_data_layer",
         "versionId": "1"
       },
-      "param": []
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "dataLayer.push"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   },
