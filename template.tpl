@@ -1,4 +1,12 @@
-﻿___INFO___
+﻿___TERMS_OF_SERVICE___
+
+By creating or modifying this file you agree to Google Tag Manager's Community
+Template Gallery Developer Terms of Service available at
+https://developers.google.com/tag-manager/gallery-tos (or such other URL as
+Google may provide), as modified from time to time.
+
+
+___INFO___
 
 {
   "type": "TAG",
@@ -56,7 +64,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage, such as cookies (web) or device identifiers (apps), related to advertising."
         },
         "isUnique": false
       },
@@ -85,26 +94,6 @@ ___TEMPLATE_PARAMETERS___
           "type": "SELECT",
           "name": "analytics_storage",
           "displayName": "analytics_storage",
-          "macrosInSelect": false,
-          "selectItems": [
-            {
-              "value": "denied",
-              "displayValue": "denied"
-            },
-            {
-              "value": "granted",
-              "displayValue": "granted"
-            }
-          ],
-          "simpleValueType": true
-        },
-        "isUnique": false
-      },
-      {
-        "param": {
-          "type": "SELECT",
-          "name": "functionality_storage",
-          "displayName": "functionality_storage",
           "macrosInSelect": false,
           "selectItems": [
             {
@@ -160,7 +149,8 @@ ___TEMPLATE_PARAMETERS___
         },
         "isUnique": false
       }
-    ]
+    ],
+    "help": "Add your default consent settings here. \u003ca href\u003d\"https://developers.google.com/tag-platform/security/concepts/consent-mode#consent-types\"\u003eLearn more\u003c/a\u003e"
   },
   {
     "type": "CHECKBOX",
@@ -179,7 +169,7 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-// var log = require('logToConsole');
+var log = require('logToConsole');
 var callInWindow = require("callInWindow");
 var createQueue = require("createQueue");
 var setDefaultConsentState = require("setDefaultConsentState");
@@ -194,11 +184,10 @@ var theConsentState = {
   ad_storage: "denied",
   analytics_storage: "denied",
   ad_user_data: "denied",
-  functionality_storage: "denied",
   personalization_storage: "denied",
   ad_personalization: "denied",
-  security_storage: "denied",
-  wait_for_update: 500
+  functionality_storage: "granted",
+  security_storage: "granted"
 };
 
 var dataLayerPush = createQueue('dataLayer');
@@ -242,8 +231,6 @@ var updateConsentObject = function () {
     currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_personalization;
   theConsentState.ad_storage =
     currentCookieValues[1] === "false" ? "denied" : theConsentState.ad_storage;
-  theConsentState.functionality_storage =
-    currentCookieValues[2] === "false" ? "denied" : theConsentState.functionality_storage;
 
   return theConsentState;
 };
@@ -260,9 +247,10 @@ if (consentModeEnabled !== false) {
         ad_storage: settings.ad_storage,
         ad_user_data: settings.ad_user_data,
         analytics_storage: settings.analytics_storage,
-        functionality_storage: settings.functionality_storage,
         personalization_storage: settings.personalization_storage,
         ad_personalization: settings.ad_personalization,
+        functionality_storage: theConsentState.functionality_storage,
+        security_storage: theConsentState.security_storage,
       };
 
       if(settings.region){
@@ -274,7 +262,17 @@ if (consentModeEnabled !== false) {
       setDefaultConsentState(defaultData);
     }
   }else{
-    setDefaultConsentState(theConsentState);
+    var defaultData = {
+      ad_storage: theConsentState.ad_storage,
+      analytics_storage: theConsentState.analytics_storage,
+      ad_user_data: theConsentState.ad_user_data,
+      personalization_storage: theConsentState.personalization_storage,
+      ad_personalization: theConsentState.ad_personalization,
+      functionality_storage: theConsentState.functionality_storage,
+      security_storage: theConsentState.security_storage,
+      wait_for_update: 500
+    };
+    setDefaultConsentState(defaultData);
   }
 
   if(data.ads_data_redaction){
@@ -289,6 +287,7 @@ if (consentModeEnabled !== false) {
   callInWindow("_hsp.push", [
     "addPrivacyConsentListener",
     function () {
+      log('consent changed!!');
       updateConsentObject();
       updateConsentState(theConsentState);
       dataLayerPush({'event': 'cookie_consent_update'});
@@ -767,7 +766,7 @@ ___WEB_PERMISSIONS___
             "listItem": [
               {
                 "type": 1,
-                "string": "dataLayer.push"
+                "string": "push"
               }
             ]
           }
