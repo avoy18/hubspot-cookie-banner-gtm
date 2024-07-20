@@ -43,10 +43,12 @@ ___TEMPLATE_PARAMETERS___
         "param": {
           "type": "TEXT",
           "name": "region",
-          "displayName": "Region (leave blank to have consent apply to all regions)",
-          "simpleValueType": true
+          "displayName": "Region",
+          "simpleValueType": true,
+          "help": "A comma separated list of region codes. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave blank for consent to apply to all regions. (example usage: UA,ES,GB,FR)"
         },
         "isUnique": true
+
       },
       {
         "param": {
@@ -85,7 +87,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Sets consent for sending user data to Google for online advertising purposes."
         },
         "isUnique": false
       },
@@ -105,7 +108,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage, such as cookies (web) or device identifiers (apps), related to analytics, for example, visit duration."
         },
         "isUnique": false
       },
@@ -125,7 +129,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage related to personalization, for example, video recommendations."
         },
         "isUnique": false
       },
@@ -145,7 +150,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Sets consent for personalized advertising."
         },
         "isUnique": false
       }
@@ -169,7 +175,7 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-var log = require('logToConsole');
+// var log = require('logToConsole');
 var callInWindow = require("callInWindow");
 var createQueue = require("createQueue");
 var setDefaultConsentState = require("setDefaultConsentState");
@@ -287,7 +293,6 @@ if (consentModeEnabled !== false) {
   callInWindow("_hsp.push", [
     "addPrivacyConsentListener",
     function () {
-      log('consent changed!!');
       updateConsentObject();
       updateConsentState(theConsentState);
       dataLayerPush({'event': 'cookie_consent_update'});
