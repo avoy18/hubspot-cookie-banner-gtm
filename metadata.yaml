@@ -1,6 +1,8 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
+  - sha: 3437e254e0452bb51280377e398f1368c8f7d512
+    changeNotes: ad_personalization, UX improvements
   - sha: 617761e5c945e0c49ea5391b404280235c53bc47
     changeNotes: Consent by region, Data redaction, URL passthrough
   - sha: a6386f4fb77a2818df28741ed37e8c699dc01aa7
