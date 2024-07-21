@@ -1,4 +1,12 @@
-﻿___INFO___
+﻿___TERMS_OF_SERVICE___
+
+By creating or modifying this file you agree to Google Tag Manager's Community
+Template Gallery Developer Terms of Service available at
+https://developers.google.com/tag-manager/gallery-tos (or such other URL as
+Google may provide), as modified from time to time.
+
+
+___INFO___
 
 {
   "type": "TAG",
@@ -35,10 +43,12 @@ ___TEMPLATE_PARAMETERS___
         "param": {
           "type": "TEXT",
           "name": "region",
-          "displayName": "Region (leave blank to have consent apply to all regions)",
-          "simpleValueType": true
+          "displayName": "Region",
+          "simpleValueType": true,
+          "help": "A comma separated list of region codes. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave blank for consent to apply to all regions. (example usage: UA,ES,GB,FR)"
         },
         "isUnique": true
+
       },
       {
         "param": {
@@ -56,7 +66,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage, such as cookies (web) or device identifiers (apps), related to advertising."
         },
         "isUnique": false
       },
@@ -76,7 +87,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Sets consent for sending user data to Google for online advertising purposes."
         },
         "isUnique": false
       },
@@ -96,27 +108,8 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
-        },
-        "isUnique": false
-      },
-      {
-        "param": {
-          "type": "SELECT",
-          "name": "functionality_storage",
-          "displayName": "functionality_storage",
-          "macrosInSelect": false,
-          "selectItems": [
-            {
-              "value": "denied",
-              "displayValue": "denied"
-            },
-            {
-              "value": "granted",
-              "displayValue": "granted"
-            }
-          ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage, such as cookies (web) or device identifiers (apps), related to analytics, for example, visit duration."
         },
         "isUnique": false
       },
@@ -136,11 +129,34 @@ ___TEMPLATE_PARAMETERS___
               "displayValue": "granted"
             }
           ],
-          "simpleValueType": true
+          "simpleValueType": true,
+          "help": "Enables storage related to personalization, for example, video recommendations."
+        },
+        "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "ad_personalization",
+          "displayName": "ad_personalization",
+          "macrosInSelect": false,
+          "selectItems": [
+            {
+              "value": "denied",
+              "displayValue": "denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "granted"
+            }
+          ],
+          "simpleValueType": true,
+          "help": "Sets consent for personalized advertising."
         },
         "isUnique": false
       }
-    ]
+    ],
+    "help": "Add your default consent settings here. \u003ca href\u003d\"https://developers.google.com/tag-platform/security/concepts/consent-mode#consent-types\"\u003eLearn more\u003c/a\u003e"
   },
   {
     "type": "CHECKBOX",
@@ -161,6 +177,7 @@ ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 // var log = require('logToConsole');
 var callInWindow = require("callInWindow");
+var createQueue = require("createQueue");
 var setDefaultConsentState = require("setDefaultConsentState");
 var gtagSet = require('gtagSet');
 var updateConsentState = require("updateConsentState");
@@ -173,11 +190,13 @@ var theConsentState = {
   ad_storage: "denied",
   analytics_storage: "denied",
   ad_user_data: "denied",
-  functionality_storage: "denied",
   personalization_storage: "denied",
-  security_storage: "denied",
-  wait_for_update: 500
+  ad_personalization: "denied",
+  functionality_storage: "granted",
+  security_storage: "granted"
 };
+
+var dataLayerPush = createQueue('dataLayer');
 
 /**
  * Splits the input in a correct way to parse the cookie data
@@ -212,10 +231,12 @@ var updateConsentObject = function () {
     currentCookieValues[0] === "false" ? "denied" : theConsentState.analytics_storage;
   theConsentState.ad_user_data =
     currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_user_data;
+  theConsentState.personalization_storage =
+    currentCookieValues[0] === "false" ? "denied" : theConsentState.personalization_storage;
+  theConsentState.ad_personalization =
+    currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_personalization;
   theConsentState.ad_storage =
     currentCookieValues[1] === "false" ? "denied" : theConsentState.ad_storage;
-  theConsentState.functionality_storage =
-    currentCookieValues[2] === "false" ? "denied" : theConsentState.functionality_storage;
 
   return theConsentState;
 };
@@ -232,8 +253,10 @@ if (consentModeEnabled !== false) {
         ad_storage: settings.ad_storage,
         ad_user_data: settings.ad_user_data,
         analytics_storage: settings.analytics_storage,
-        functionality_storage: settings.functionality_storage,
         personalization_storage: settings.personalization_storage,
+        ad_personalization: settings.ad_personalization,
+        functionality_storage: theConsentState.functionality_storage,
+        security_storage: theConsentState.security_storage,
       };
 
       if(settings.region){
@@ -245,7 +268,17 @@ if (consentModeEnabled !== false) {
       setDefaultConsentState(defaultData);
     }
   }else{
-    setDefaultConsentState(theConsentState);
+    var defaultData = {
+      ad_storage: theConsentState.ad_storage,
+      analytics_storage: theConsentState.analytics_storage,
+      ad_user_data: theConsentState.ad_user_data,
+      personalization_storage: theConsentState.personalization_storage,
+      ad_personalization: theConsentState.ad_personalization,
+      functionality_storage: theConsentState.functionality_storage,
+      security_storage: theConsentState.security_storage,
+      wait_for_update: 500
+    };
+    setDefaultConsentState(defaultData);
   }
 
   if(data.ads_data_redaction){
@@ -262,7 +295,7 @@ if (consentModeEnabled !== false) {
     function () {
       updateConsentObject();
       updateConsentState(theConsentState);
-      callInWindow("gtag", "event", "cookie_consent_update");
+      dataLayerPush({'event': 'cookie_consent_update'});
     },
   ]);
 }
@@ -649,6 +682,37 @@ ___WEB_PERMISSIONS___
                     "boolean": true
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "consentType"
+                  },
+                  {
+                    "type": 1,
+                    "string": "read"
+                  },
+                  {
+                    "type": 1,
+                    "string": "write"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "ad_personalization"
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  },
+                  {
+                    "type": 8,
+                    "boolean": true
+                  }
+                ]
               }
             ]
           }
@@ -699,7 +763,23 @@ ___WEB_PERMISSIONS___
         "publicId": "write_data_layer",
         "versionId": "1"
       },
-      "param": []
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "push"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
     },
     "isRequired": true
   },
