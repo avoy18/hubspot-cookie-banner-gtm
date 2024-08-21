@@ -48,7 +48,6 @@ ___TEMPLATE_PARAMETERS___
           "help": "A comma separated list of region codes. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave blank for consent to apply to all regions. (example usage: UA,ES,GB,FR)"
         },
         "isUnique": true
-
       },
       {
         "param": {
@@ -774,27 +773,6 @@ ___WEB_PERMISSIONS___
                 "string": "push"
               }
             ]
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  },
-  {
-    "instance": {
-      "key": {
-        "publicId": "logging",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "environments",
-          "value": {
-            "type": 1,
-            "string": "all"
           }
         }
       ]
