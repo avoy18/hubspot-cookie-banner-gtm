@@ -228,15 +228,15 @@ var updateConsentObject = function () {
   );
 
   theConsentState.analytics_storage =
-    currentCookieValues[0] === "false" ? "denied" : theConsentState.analytics_storage;
+    currentCookieValues[0] === "true" ? "granted" : theConsentState.analytics_storage;
   theConsentState.ad_user_data =
-    currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_user_data;
+    currentCookieValues[0] === "true" ? "granted" : theConsentState.ad_user_data;
   theConsentState.personalization_storage =
-    currentCookieValues[0] === "false" ? "denied" : theConsentState.personalization_storage;
+    currentCookieValues[0] === "true" ? "granted" : theConsentState.personalization_storage;
   theConsentState.ad_personalization =
-    currentCookieValues[0] === "false" ? "denied" : theConsentState.ad_personalization;
+    currentCookieValues[0] === "true" ? "granted" : theConsentState.ad_personalization;
   theConsentState.ad_storage =
-    currentCookieValues[1] === "false" ? "denied" : theConsentState.ad_storage;
+    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_storage;
 
   return theConsentState;
 };
@@ -259,11 +259,13 @@ if (consentModeEnabled !== false) {
         security_storage: theConsentState.security_storage,
       };
 
+      defaultData.wait_for_update = 500;
+
       if(settings.region){
         defaultData.region = splitInput(settings.region);
+      }else{
+        theConsentState = defaultData; // only set default for no region
       }
-
-      defaultData.wait_for_update = 500;
 
       setDefaultConsentState(defaultData);
     }
@@ -772,6 +774,14 @@ ___WEB_PERMISSIONS___
               {
                 "type": 1,
                 "string": "push"
+              },
+              {
+                "type": 1,
+                "string": "ads_data_redaction"
+              },
+              {
+                "type": 1,
+                "string": "url_passthrough"
               }
             ]
           }
