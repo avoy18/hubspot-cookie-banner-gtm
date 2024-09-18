@@ -261,7 +261,7 @@ if (consentModeEnabled !== false) {
 
       defaultData.wait_for_update = 500;
 
-      if(settings.region){
+      if(typeof settings.region === 'string' && settings.region.trim().length > 0){
         defaultData.region = splitInput(settings.region);
       }else{
         theConsentState = defaultData; // only set default for no region
