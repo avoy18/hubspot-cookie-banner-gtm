@@ -1,4 +1,4 @@
-﻿___TERMS_OF_SERVICE___
+___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -13,7 +13,7 @@ ___INFO___
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "displayName": "Hubspot CMP - Hubspot cookie banner - integration",
+  "displayName": "Hubspot CMP - Hubspot cookie banner integration",
   "categories": [
     "PERSONALIZATION",
     "TAG_MANAGEMENT",
