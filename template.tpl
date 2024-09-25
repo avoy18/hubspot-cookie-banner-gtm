@@ -48,7 +48,6 @@ ___TEMPLATE_PARAMETERS___
           "help": "A comma separated list of region codes. Region codes are expressed using country and/or subdivisions in ISO 3166-2 format. Leave blank for consent to apply to all regions. (example usage: UA,ES,GB,FR)"
         },
         "isUnique": true
-
       },
       {
         "param": {
@@ -835,6 +834,6 @@ scenarios:
 
 ___NOTES___
 
+Sept 25 - consent change updates
+
 Jul 16 2024 - connected user controls and refactored the code to work with ES5
-
-
