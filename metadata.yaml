@@ -1,7 +1,7 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
-  - sha: ed25d2193069cc56afc657ddb0dfd61ec6216e06
+  - sha: 0880f5bd07a433f83349d41be79b207f97ef7b33
     changeNotes: Update permissions, refactor default consent state
   - sha: fcf39c33ed58a37699d355a6a989be4e0d1bd905
     changeNotes: Minor tweaks, reimport the template
