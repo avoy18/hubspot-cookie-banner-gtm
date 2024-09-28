@@ -1,6 +1,8 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
+  - sha: 408440ce735693525620f5905e0464cbfeb0190e
+    changeNotes: Fix a bug in consent categories, update display name
   - sha: 30cdc83f6e97f62dbf0e1b32f26c3a7dea5b9e30
     changeNotes: Update permissions, refactor default consent state
   - sha: fcf39c33ed58a37699d355a6a989be4e0d1bd905
