@@ -229,11 +229,11 @@ var updateConsentObject = function () {
   theConsentState.analytics_storage =
     currentCookieValues[0] === "true" ? "granted" : theConsentState.analytics_storage;
   theConsentState.ad_user_data =
-    currentCookieValues[0] === "true" ? "granted" : theConsentState.ad_user_data;
+    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_user_data;
   theConsentState.personalization_storage =
-    currentCookieValues[0] === "true" ? "granted" : theConsentState.personalization_storage;
+    currentCookieValues[2] === "true" ? "granted" : theConsentState.personalization_storage;
   theConsentState.ad_personalization =
-    currentCookieValues[0] === "true" ? "granted" : theConsentState.ad_personalization;
+    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_personalization;
   theConsentState.ad_storage =
     currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_storage;
 
