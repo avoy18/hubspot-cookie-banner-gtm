@@ -2,7 +2,7 @@ homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
   - sha: 3d10e50b35dacf8a9987f3ba15e169d19f798ab0
-    changeNotes: Fix: mappings for consent categories!
+    changeNotes: Fix mappings for consent categories, thanks @GavIngram!
   - sha: 408440ce735693525620f5905e0464cbfeb0190e
     changeNotes: Fix a bug in consent categories, update display name
   - sha: 30cdc83f6e97f62dbf0e1b32f26c3a7dea5b9e30
