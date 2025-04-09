@@ -213,7 +213,7 @@ var splitCookieInput = function (input) {
 };
 
 /**
- * Splits the input string using comma as a delimiter, returning an array of strings
+ * Splits the input string using a comma as a delimiter, returning an array of strings
  */
 var splitInput = function (input) {
   return input.split(',')
