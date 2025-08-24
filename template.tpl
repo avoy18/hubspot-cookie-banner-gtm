@@ -10,7 +10,7 @@ ___INFO___
 
 {
   "type": "TAG",
-  "id": "cvt_temp_public_id",
+  "id": "cvt_NSV9H",
   "version": 1,
   "securityGroups": [],
   "displayName": "Hubspot CMP - Hubspot cookie banner integration",
@@ -183,6 +183,7 @@ var updateConsentState = require("updateConsentState");
 var getCookieValues = require("getCookieValues");
 var defaultConsentSettings = data.defaultConsentSettings;
 var consentModeEnabled = data.consentModeEnabled;
+var isTestmode = data.isTestmode;
 
 // Default consent state is set to denied for everything
 var theConsentState = {
@@ -221,21 +222,34 @@ var splitInput = function (input) {
       .filter(entry => entry.length !== 0);
 };
 
+/**
+ * Returns the consent value based on the cookie value and the fallback value
+ * @param cookieValue - The value of the cookie
+ * @param fallbackValue - The default value for the consent
+ * @returns The consent value
+ */
+var getConsentValue = function(cookieValue, fallbackValue) {
+  // If cookie value is explicitly "true" or "false", use that
+  if (cookieValue === "true") {
+    return "granted";
+  }
+  if (cookieValue === "false") {
+    return "denied";
+  }
+  // If undefined/empty, use the regional default
+  return fallbackValue;
+};
+
 var updateConsentObject = function () {
   var currentCookieValues = splitCookieInput(
     getCookieValues("__hs_cookie_cat_pref")[0]
   );
 
-  theConsentState.analytics_storage =
-    currentCookieValues[0] === "true" ? "granted" : theConsentState.analytics_storage;
-  theConsentState.ad_user_data =
-    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_user_data;
-  theConsentState.personalization_storage =
-    currentCookieValues[2] === "true" ? "granted" : theConsentState.personalization_storage;
-  theConsentState.ad_personalization =
-    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_personalization;
-  theConsentState.ad_storage =
-    currentCookieValues[1] === "true" ? "granted" : theConsentState.ad_storage;
+  theConsentState.analytics_storage = getConsentValue(currentCookieValues[0], theConsentState.analytics_storage);
+  theConsentState.ad_user_data = getConsentValue(currentCookieValues[1], theConsentState.ad_user_data);
+  theConsentState.personalization_storage = getConsentValue(currentCookieValues[2], theConsentState.personalization_storage);
+  theConsentState.ad_personalization = getConsentValue(currentCookieValues[1], theConsentState.ad_personalization);
+  theConsentState.ad_storage = getConsentValue(currentCookieValues[1], theConsentState.ad_storage);
 
   return {
     ad_storage: theConsentState.ad_storage,
@@ -307,6 +321,11 @@ if (consentModeEnabled !== false) {
       dataLayerPush({'event': 'cookie_consent_update'});
     },
   ]);
+
+  if(isTestmode){
+    updateConsentState(updateConsentObject());
+    dataLayerPush({'event': 'cookie_consent_update'});
+  }
 }
 
 // Call data.gtmOnSuccess when the tag is finished.
@@ -823,10 +842,273 @@ ___WEB_PERMISSIONS___
 
 ___TESTS___
 
-scenarios: []
+scenarios:
+- name: No defaults passed
+  code: |2-
+
+    runCode(mockData);
+
+    // Verify default consent state is set
+    assertApi('setDefaultConsentState').wasCalledWith({
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "denied",
+      personalization_storage: "denied",
+      ad_personalization: "denied",
+      functionality_storage: "granted",
+      security_storage: "granted",
+      wait_for_update: 500
+    });
+
+    // Verify HubSpot listener is set up
+    assertApi('callInWindow').wasCalled();
+
+    // Verify tag completes successfully
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Defaults - One region
+  code: |-
+    // Setup
+    mockData.defaultConsentSettings = [
+      {
+        // No region - applies to all regions
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      }
+    ];
+
+    runCode(mockData);
+
+    // default with granted
+    assertApi('setDefaultConsentState').wasCalledWith({
+      ad_storage: "granted",
+      ad_user_data: "granted",
+      analytics_storage: "granted",
+      personalization_storage: "granted",
+      ad_personalization: "granted",
+      functionality_storage: "granted",
+      security_storage: "granted",
+      wait_for_update: 500
+    });
+
+    // Verify HubSpot listener is set up
+    assertApi('callInWindow').wasCalled();
+
+    // Verify tag completes successfully
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Defaults - With 2 regions
+  code: |-
+    // Setup
+    mockData.defaultConsentSettings = [
+      {
+        // No region - applies to all regions
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      },
+      {
+        // Specific region (e.g., GDPR countries)
+        region: "GB,FR,DE,ES,IT",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        analytics_storage: "denied",
+        personalization_storage: "denied",
+        ad_personalization: "denied"
+      }
+    ];
+
+    runCode(mockData);
+
+    // default with granted
+    assertApi('setDefaultConsentState').wasCalledWith({
+      ad_storage: "granted",
+      ad_user_data: "granted",
+      analytics_storage: "granted",
+      personalization_storage: "granted",
+      ad_personalization: "granted",
+      functionality_storage: "granted",
+      security_storage: "granted",
+      wait_for_update: 500
+    });
+
+    // EU specific with settings denied
+    assertApi('setDefaultConsentState').wasCalledWith({
+      region: ["GB","FR","DE","ES","IT"],
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "denied",
+      personalization_storage: "denied",
+      ad_personalization: "denied",
+      functionality_storage: "granted",
+      security_storage: "granted",
+      wait_for_update: 500
+    });
+
+    // Verify HubSpot listener is set up
+    assertApi('callInWindow').wasCalled();
+
+    // Verify tag completes successfully
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Consent state change from true to false
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      }
+    ];
+
+    mock('getCookieValues', () => ['1:false_2:false_3:false']);
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    // Verify updateConsentState was called with the expected consent object
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "denied",
+      personalization_storage: "denied",
+      ad_personalization: "denied",
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Modified consent settings
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      }
+    ];
+
+    mock('getCookieValues', () => ['1:true_2:false_3:true']);
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    // Verify updateConsentState was called with the expected consent object
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "denied",         // From cookie[1] = "false"
+      ad_user_data: "denied",       // From cookie[1] = "false"
+      analytics_storage: "granted",  // From cookie[0] = "true"
+      personalization_storage: "granted", // From cookie[2] = "true"
+      ad_personalization: "denied",  // From cookie[1] = "false"
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Deny on multiregion
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        // Global default - all granted
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      },
+      {
+        // EU region - all denied
+        region: "GB,FR,DE,ES,IT,NL,BE,AT,IE,PT,SE,DK,FI,NO,CH,PL,CZ,HU,RO,BG,HR,SI,SK,LT,LV,EE,LU,MT,CY",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        analytics_storage: "denied",
+        personalization_storage: "denied",
+        ad_personalization: "denied"
+      }
+    ];
+
+    // Mock cookie values to deny consent
+    mock('getCookieValues', () => ['1:false_2:false_3:false']);
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    // Verify updateConsentState was called with the expected consent object
+    // Since cookies explicitly deny, it should be denied regardless of regional defaults
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "denied",
+      personalization_storage: "denied",
+      ad_personalization: "denied",
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Allow on multiregion
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        // Global default - all granted
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "granted",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      },
+      {
+        // EU region - all denied
+        region: "GB,FR,DE,ES,IT,NL,BE,AT,IE,PT,SE,DK,FI,NO,CH,PL,CZ,HU,RO,BG,HR,SI,SK,LT,LV,EE,LU,MT,CY",
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        analytics_storage: "denied",
+        personalization_storage: "denied",
+        ad_personalization: "denied"
+      }
+    ];
+
+    // Mock cookie values to deny consent
+    mock('getCookieValues', () => ['1:true_2:true_3:true']);
+
+    // Call runCode to run the template's code.
+    runCode(mockData);
+
+    // Verify updateConsentState was called with the expected consent object
+    // Since cookies explicitly deny, it should be denied regardless of regional defaults
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "granted",
+      ad_user_data: "granted",
+      analytics_storage: "granted",
+      personalization_storage: "granted",
+      ad_personalization: "granted",
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    // Verify that the tag finished successfully.
+    assertApi('gtmOnSuccess').wasCalled();
+setup: |-
+  // Setup
+  const mockData = {
+    ads_data_redaction: false,
+    url_passthrough: false,
+    isTestmode: true,
+    consentModeEnabled: true,
+  };
 
 
 ___NOTES___
+Aug 24 2025 - fix a bug with the default content stante and multiple regions & add tests
 
 Sept 25 - consent change updates
 
