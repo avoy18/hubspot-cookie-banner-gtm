@@ -1,7 +1,7 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
-  - sha: c58b159b06dc15ebdd2826d22928b9b982ff8f6b
+  - sha: a3762f523bc56dbbe7a29550cce07c954e1d03ef
     changeNotes: Fix the default consent state with multiple regions, add tests
   - sha: 3d10e50b35dacf8a9987f3ba15e169d19f798ab0
     changeNotes: Fix mappings for consent categories, thanks @GavIngram!
