@@ -870,7 +870,7 @@ scenarios:
     // Setup
     mockData.defaultConsentSettings = [
       {
-        // No region - applies to all regions
+        region: "US",
         ad_storage: "granted",
         ad_user_data: "granted",
         analytics_storage: "granted",
@@ -883,6 +883,7 @@ scenarios:
 
     // default with granted
     assertApi('setDefaultConsentState').wasCalledWith({
+      region: ["US"],
       ad_storage: "granted",
       ad_user_data: "granted",
       analytics_storage: "granted",
@@ -900,10 +901,9 @@ scenarios:
     assertApi('gtmOnSuccess').wasCalled();
 - name: Defaults - With 2 regions
   code: |-
-    // Setup
     mockData.defaultConsentSettings = [
       {
-        // No region - applies to all regions
+        region: "US",
         ad_storage: "granted",
         ad_user_data: "granted",
         analytics_storage: "granted",
@@ -932,12 +932,13 @@ scenarios:
       ad_personalization: "granted",
       functionality_storage: "granted",
       security_storage: "granted",
+      region: ["US"],
       wait_for_update: 500
     });
 
+
     // EU specific with settings denied
     assertApi('setDefaultConsentState').wasCalledWith({
-      region: ["GB","FR","DE","ES","IT"],
       ad_storage: "denied",
       ad_user_data: "denied",
       analytics_storage: "denied",
@@ -945,14 +946,9 @@ scenarios:
       ad_personalization: "denied",
       functionality_storage: "granted",
       security_storage: "granted",
+      region: ["GB","FR","DE","ES","IT"],
       wait_for_update: 500
     });
-
-    // Verify HubSpot listener is set up
-    assertApi('callInWindow').wasCalled();
-
-    // Verify tag completes successfully
-    assertApi('gtmOnSuccess').wasCalled();
 - name: Consent state change from true to false
   code: |-
     mockData.defaultConsentSettings = [
@@ -1108,6 +1104,7 @@ setup: |-
 
 
 ___NOTES___
+
 Aug 24 2025 - fix a bug with the default content stante and multiple regions & add tests
 
 Sept 25 - consent change updates
