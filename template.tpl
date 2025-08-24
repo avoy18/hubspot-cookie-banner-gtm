@@ -1105,7 +1105,7 @@ setup: |-
 
 ___NOTES___
 
-Aug 24 2025 - fix a bug with the default content stante and multiple regions & add tests
+Aug 24 2025 - fix a bug with the default content stante and multiple regions & add some tests
 
 Sept 25 - consent change updates
 
