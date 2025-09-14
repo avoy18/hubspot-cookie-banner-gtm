@@ -318,13 +318,13 @@ if (consentModeEnabled !== false) {
     function () {
       updateConsentState(updateConsentObject());
       
-      dataLayerPush({'event': 'cookie_consent_update'});
+      dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': updateConsentObject()});
     },
   ]);
 
   if(isTestmode){
     updateConsentState(updateConsentObject());
-    dataLayerPush({'event': 'cookie_consent_update'});
+    dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': updateConsentObject()});
   }
 }
 
