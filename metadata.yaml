@@ -1,6 +1,8 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
+  - sha: d360341446223ca5710d65b95cc4b1b43f5aac11
+    changeNotes: Pass consent state to dataLayer
   - sha: a3762f523bc56dbbe7a29550cce07c954e1d03ef
     changeNotes: Fix the default consent state with multiple regions, add tests
   - sha: 3d10e50b35dacf8a9987f3ba15e169d19f798ab0
