@@ -202,7 +202,9 @@ var dataLayerPush = createQueue('dataLayer');
  * Splits the input in a correct way to parse the cookie data
  */
 var splitCookieInput = function (input) {
-  input = typeof input === "undefined" ? "" : input;
+  if (typeof input === "undefined" || input === "") {
+    return [];
+  }
   return input
     .split("_")
     .map(function (entry) {
@@ -218,8 +220,8 @@ var splitCookieInput = function (input) {
  */
 var splitInput = function (input) {
   return input.split(',')
-      .map(entry => entry.trim())
-      .filter(entry => entry.length !== 0);
+      .map(function (entry) { return entry.trim(); })
+      .filter(function (entry) { return entry.length !== 0; });
 };
 
 /**
@@ -245,18 +247,12 @@ var updateConsentObject = function () {
     getCookieValues("__hs_cookie_cat_pref")[0]
   );
 
-  theConsentState.analytics_storage = getConsentValue(currentCookieValues[0], theConsentState.analytics_storage);
-  theConsentState.ad_user_data = getConsentValue(currentCookieValues[1], theConsentState.ad_user_data);
-  theConsentState.personalization_storage = getConsentValue(currentCookieValues[2], theConsentState.personalization_storage);
-  theConsentState.ad_personalization = getConsentValue(currentCookieValues[1], theConsentState.ad_personalization);
-  theConsentState.ad_storage = getConsentValue(currentCookieValues[1], theConsentState.ad_storage);
-
   return {
-    ad_storage: theConsentState.ad_storage,
-    ad_user_data: theConsentState.ad_user_data,
-    analytics_storage: theConsentState.analytics_storage,
-    personalization_storage: theConsentState.personalization_storage,
-    ad_personalization: theConsentState.ad_personalization,
+    ad_storage: getConsentValue(currentCookieValues[1], theConsentState.ad_storage),
+    ad_user_data: getConsentValue(currentCookieValues[1], theConsentState.ad_user_data),
+    analytics_storage: getConsentValue(currentCookieValues[0], theConsentState.analytics_storage),
+    personalization_storage: getConsentValue(currentCookieValues[2], theConsentState.personalization_storage),
+    ad_personalization: getConsentValue(currentCookieValues[1], theConsentState.ad_personalization),
     functionality_storage: theConsentState.functionality_storage,
     security_storage: theConsentState.security_storage
   };
@@ -316,15 +312,18 @@ if (consentModeEnabled !== false) {
   callInWindow("_hsp.push", [
     "addPrivacyConsentListener",
     function () {
-      updateConsentState(updateConsentObject());
+      var consentObject = updateConsentObject();
+      updateConsentState(consentObject);
       
-      dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': updateConsentObject()});
+      dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
     },
   ]);
 
   if(isTestmode){
-    updateConsentState(updateConsentObject());
-    dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': updateConsentObject()});
+    log('isTestmode');
+    var consentObject = updateConsentObject();
+    updateConsentState(consentObject);
+    dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
   }
 }
 
