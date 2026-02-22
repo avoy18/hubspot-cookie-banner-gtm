@@ -1093,6 +1093,60 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
+- name: Default preserved on empty cookie
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        analytics_storage: "granted",
+        personalization_storage: "denied",
+        ad_personalization: "denied"
+      }
+    ];
+
+    mock('getCookieValues', () => ['']);
+
+    runCode(mockData);
+
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "granted",
+      personalization_storage: "denied",
+      ad_personalization: "denied",
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: Missing category ID falls back to default
+  code: |-
+    mockData.defaultConsentSettings = [
+      {
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        analytics_storage: "denied",
+        personalization_storage: "granted",
+        ad_personalization: "granted"
+      }
+    ];
+
+    mock('getCookieValues', () => ['1:true_3:false']);
+
+    runCode(mockData);
+
+    assertApi('updateConsentState').wasCalledWith({
+      ad_storage: "granted",
+      ad_user_data: "granted",
+      analytics_storage: "granted",
+      personalization_storage: "denied",
+      ad_personalization: "granted",
+      functionality_storage: "granted",
+      security_storage: "granted"
+    });
+
+    assertApi('gtmOnSuccess').wasCalled();
 setup: |-
   // Setup
   const mockData = {
