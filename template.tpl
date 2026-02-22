@@ -202,17 +202,18 @@ var dataLayerPush = createQueue('dataLayer');
  * Splits the input in a correct way to parse the cookie data
  */
 var splitCookieInput = function (input) {
+  var result = {};
   if (typeof input === "undefined" || input === "") {
-    return [];
+    return result;
   }
-  return input
-    .split("_")
-    .map(function (entry) {
-      return entry.trim().split(":")[1] || "false";
-    })
-    .filter(function (entry) {
-      return entry.length !== 0;
-    });
+  var entries = input.split("_");
+  for (var i = 0; i < entries.length; i++) {
+    var parts = entries[i].trim().split(":");
+    if (parts.length === 2 && parts[0]) {
+      result[parts[0]] = parts[1];
+    }
+  }
+  return result;
 };
 
 /**
@@ -248,11 +249,11 @@ var updateConsentObject = function () {
   );
 
   return {
-    ad_storage: getConsentValue(currentCookieValues[1], theConsentState.ad_storage),
-    ad_user_data: getConsentValue(currentCookieValues[1], theConsentState.ad_user_data),
-    analytics_storage: getConsentValue(currentCookieValues[0], theConsentState.analytics_storage),
-    personalization_storage: getConsentValue(currentCookieValues[2], theConsentState.personalization_storage),
-    ad_personalization: getConsentValue(currentCookieValues[1], theConsentState.ad_personalization),
+    ad_storage: getConsentValue(currentCookieValues["2"], theConsentState.ad_storage),
+    ad_user_data: getConsentValue(currentCookieValues["2"], theConsentState.ad_user_data),
+    analytics_storage: getConsentValue(currentCookieValues["1"], theConsentState.analytics_storage),
+    personalization_storage: getConsentValue(currentCookieValues["3"], theConsentState.personalization_storage),
+    ad_personalization: getConsentValue(currentCookieValues["2"], theConsentState.ad_personalization),
     functionality_storage: theConsentState.functionality_storage,
     security_storage: theConsentState.security_storage
   };
