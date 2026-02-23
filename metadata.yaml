@@ -1,7 +1,7 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
-  - sha: f0c54bf4f91b4d134c63b7a00a52692a6abc8cf9
+  - sha: 9dacf95bc1c12008af0b8630c0dea12e10094ae6
     changeNotes: Fix cookie parsing logic and state mutability bugs
   - sha: d360341446223ca5710d65b95cc4b1b43f5aac11
     changeNotes: Pass consent state to dataLayer
