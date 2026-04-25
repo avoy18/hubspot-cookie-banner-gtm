@@ -153,6 +153,27 @@ ___TEMPLATE_PARAMETERS___
           "help": "Sets consent for personalized advertising."
         },
         "isUnique": false
+      },
+      {
+        "param": {
+          "type": "SELECT",
+          "name": "functionality_storage",
+          "displayName": "functionality_storage",
+          "macrosInSelect": false,
+          "selectItems": [
+            {
+              "value": "denied",
+              "displayValue": "denied"
+            },
+            {
+              "value": "granted",
+              "displayValue": "granted"
+            }
+          ],
+          "simpleValueType": true,
+          "help": "Enables storage that supports the functionality of the website or app such as language settings."
+        },
+        "isUnique": false
       }
     ],
     "help": "Add your default consent settings here. \u003ca href\u003d\"https://developers.google.com/tag-platform/security/concepts/consent-mode#consent-types\"\u003eLearn more\u003c/a\u003e"
@@ -272,7 +293,7 @@ if (consentModeEnabled !== false) {
         analytics_storage: settings.analytics_storage,
         personalization_storage: settings.personalization_storage,
         ad_personalization: settings.ad_personalization,
-        functionality_storage: theConsentState.functionality_storage,
+        functionality_storage: settings.functionality_storage || theConsentState.functionality_storage,
         security_storage: theConsentState.security_storage,
       };
 
