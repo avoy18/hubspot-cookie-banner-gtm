@@ -1,4 +1,4 @@
-﻿___TERMS_OF_SERVICE___
+___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -175,7 +175,6 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
 var log = require('logToConsole');
-var callInWindow = require("callInWindow");
 var createQueue = require("createQueue");
 var setDefaultConsentState = require("setDefaultConsentState");
 var gtagSet = require('gtagSet');
@@ -310,21 +309,28 @@ if (consentModeEnabled !== false) {
   }
 
   // Add an event listener to HubSpot's consent change
-  callInWindow("_hsp.push", [
+  var hspPush = createQueue("_hsp");
+  hspPush([
     "addPrivacyConsentListener",
     function () {
-      var consentObject = updateConsentObject();
-      updateConsentState(consentObject);
-      
-      dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
+      var cookieVal = getCookieValues("__hs_cookie_cat_pref")[0];
+      if (cookieVal) {
+        var consentObject = updateConsentObject();
+        updateConsentState(consentObject);
+        
+        dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
+      }
     },
   ]);
 
   if(isTestmode){
     log('isTestmode');
-    var consentObject = updateConsentObject();
-    updateConsentState(consentObject);
-    dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
+    var cookieVal = getCookieValues("__hs_cookie_cat_pref")[0];
+    if (cookieVal) {
+      var consentObject = updateConsentObject();
+      updateConsentState(consentObject);
+      dataLayerPush({'event': 'cookie_consent_update', 'hs_consent_state': consentObject});
+    }
   }
 }
 
@@ -860,8 +866,8 @@ scenarios:
       wait_for_update: 500
     });
 
-    // Verify HubSpot listener is set up
-    assertApi('callInWindow').wasCalled();
+    // Verify HubSpot listener queue is created
+    assertApi('createQueue').wasCalledWith('_hsp');
 
     // Verify tag completes successfully
     assertApi('gtmOnSuccess').wasCalled();
@@ -894,8 +900,8 @@ scenarios:
       wait_for_update: 500
     });
 
-    // Verify HubSpot listener is set up
-    assertApi('callInWindow').wasCalled();
+    // Verify HubSpot listener queue is created
+    assertApi('createQueue').wasCalledWith('_hsp');
 
     // Verify tag completes successfully
     assertApi('gtmOnSuccess').wasCalled();
@@ -1093,7 +1099,7 @@ scenarios:
 
     // Verify that the tag finished successfully.
     assertApi('gtmOnSuccess').wasCalled();
-- name: Default preserved on empty cookie
+- name: updateConsentState NOT called on empty cookie (preserves regional defaults)
   code: |-
     mockData.defaultConsentSettings = [
       {
@@ -1109,16 +1115,35 @@ scenarios:
 
     runCode(mockData);
 
-    assertApi('updateConsentState').wasCalledWith({
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      analytics_storage: "granted",
-      personalization_storage: "denied",
-      ad_personalization: "denied",
-      functionality_storage: "granted",
-      security_storage: "granted"
+    // updateConsentState should not be called to avoid overwriting regional defaults
+    assertApi('updateConsentState').wasNotCalled();
+
+    assertApi('gtmOnSuccess').wasCalled();
+- name: HubSpot listener handles empty cookie correctly
+  code: |-
+    // Setup environment where tag fires without an existing cookie
+    mockData.isTestmode = false;
+    mock('getCookieValues', () => ['']);
+    
+    // We want to capture the function passed to the _hsp queue
+    let capturedListener = null;
+    mock('createQueue', (queueName) => {
+      return (args) => {
+        if (queueName === '_hsp' && args[0] === 'addPrivacyConsentListener') {
+          capturedListener = args[1];
+        }
+      };
     });
 
+    runCode(mockData);
+    
+    // Simulate HubSpot triggering the callback immediately on load
+    if (capturedListener) {
+      capturedListener();
+    }
+
+    // It should NOT update consent state, preserving the default (e.g., regional) rules
+    assertApi('updateConsentState').wasNotCalled();
     assertApi('gtmOnSuccess').wasCalled();
 - name: Missing category ID falls back to default
   code: |-
