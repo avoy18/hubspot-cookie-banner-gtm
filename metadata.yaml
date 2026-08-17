@@ -1,6 +1,8 @@
 homepage: "https://avoy.me/"
 documentation: "https://avoy.me/blog/hubspot-cmp"
 versions:
+  - sha: 38ea0dcb3d2b30881bf19b6ba167c939149f5e34
+    changeNotes: Ensure functionality storage is correctly configured
   - sha: ea8bbb7a519735c02734d2469fff6001b19be7f9
     changeNotes: Additional bugfixes to regional defaults + the functionality_storage is now part of the default config
   - sha: 9dacf95bc1c12008af0b8630c0dea12e10094ae6
