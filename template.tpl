@@ -274,7 +274,7 @@ var updateConsentObject = function () {
     analytics_storage: getConsentValue(currentCookieValues["1"], theConsentState.analytics_storage),
     personalization_storage: getConsentValue(currentCookieValues["3"], theConsentState.personalization_storage),
     ad_personalization: getConsentValue(currentCookieValues["2"], theConsentState.ad_personalization),
-    functionality_storage: theConsentState.functionality_storage,
+    functionality_storage: getConsentValue(currentCookieValues["3"], theConsentState.functionality_storage),
     security_storage: theConsentState.security_storage
   };
 };
@@ -1000,7 +1000,7 @@ scenarios:
       analytics_storage: "denied",
       personalization_storage: "denied",
       ad_personalization: "denied",
-      functionality_storage: "granted",
+      functionality_storage: "denied",
       security_storage: "granted"
     });
 
@@ -1072,7 +1072,7 @@ scenarios:
       analytics_storage: "denied",
       personalization_storage: "denied",
       ad_personalization: "denied",
-      functionality_storage: "granted",
+      functionality_storage: "denied",
       security_storage: "granted"
     });
 
@@ -1188,7 +1188,7 @@ scenarios:
       analytics_storage: "granted",
       personalization_storage: "denied",
       ad_personalization: "granted",
-      functionality_storage: "granted",
+      functionality_storage: "denied",
       security_storage: "granted"
     });
 
